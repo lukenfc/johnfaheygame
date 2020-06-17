@@ -1,0 +1,79 @@
+.container{
+  width: 600px;
+  height: 530px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -265px;
+  margin-left: -300px;
+  background-image: url('./images/cover.jpeg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+body{
+  background-color: #003153;
+}
+#header{
+  padding: 20px;
+  background-color: black;
+  width: 560px;
+  height: 40px;
+  display: none;
+  flex-direction: row;
+}
+.link{
+  height: 100%;
+  width: auto;
+  font-size: 20px;
+  margin-right: 10px;
+}
+#tuningScreen{
+  display: none;
+  width: 270px;
+  height: 420px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -185px;
+  z-index: 2;
+  background-color: white;
+  padding: 15px;
+  overflow: scroll;
+}
+#start-button{
+  position: absolute;
+  width: 100px;
+  height: 40px;
+  top: 50%;
+  left: 50%;
+  margin-top: 100px;
+  margin-left: -50px;
+}
+#tune-button{
+  display: none;
+}
+#message{
+  display: none;
+  max-height: 150px;
+  width: 250px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: 80px;
+  margin-left: -125px;
+  z-index: 3;
+  background-color: black;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-family: 'Sans-serif';
+  font-size: 15px;
+  line-height: 10px;
+  border-style: solid;
+  border-color: gray;
+  border-width: 4px;
+  border-radius: 5px;
+}
+
+
+
