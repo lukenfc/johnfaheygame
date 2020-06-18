@@ -93,7 +93,7 @@ h2{
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-left: -120px;
+  margin-left: -80px;
   margin-top: 30px;
   width: 300px;
   height: 80px;
@@ -125,6 +125,16 @@ h2{
 #note3{
   background-color: rgba(255,255,255,.3);
 }
+.header{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+#song{
+  width: 200px;
+}
+
 
 
 
