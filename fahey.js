@@ -62,7 +62,51 @@ canvas.clear = function(){
   var ctx = canvas.getContext('2d')
   ctx.clearRect(0,0,600,400)
 }
+var note1
+var note2
+var note3
+var count
+var strikes = 0
+var frameCounter = 0
+var tempo = 450
 var playing = false
+var notes = []
+var keys = [
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z'
+]
+var songIndex = 0
+var songs = [
+  {
+    name: 'Sligo River Blues',
+    tempo: 500,
+    length: 100
+  }
+]
 var turtleIndex = false
 var turtleToggle = setInterval(()=>{
   turtleIndex = !turtleIndex
@@ -82,7 +126,6 @@ var volume = 1.0
 var backgroundMusic
 var soundtrack = new Sound('poorBoy.wav')
 var knockSound = new Sound('knockSound.mp3')
-var guitarHero = new Sound('sligo.mp3')
 var faheyNoise = new Sound('uhh1.m4a')
 var applause = new Sound('applause.m4a')
 applause.sound.volume = .6
@@ -212,43 +255,89 @@ function play(){
   document.onkeyup = checkNoteUp
 }
 function playGuitarHero(){
+  for(let i = 0; i < songs[songIndex].length; i++){
+    notes[i] = keys[Math.floor(Math.random()*26)]
+  }
+  pointer = 3
+  note1 = notes[0]
+  note2 = notes[1]
+  note3 = notes[2]
   document.getElementById('credits').style.display = 'flex'
-  document.onkeypress = checkTempo
+  document.getElementById('credits').innerHTML = `<h1 id="note1" class="note">${note1}</h1>
+  <h1 id="note2" class="note">${note2}</h1>
+  <h1 id="note3" class="note">${note3}</h1>`
   frameCounter = 0
+  count = setInterval(()=>{
+    if(frameCounter < 4){
+      speak('./sounds/beep.m4a')
+      talking = false
+      frameCounter++
+    }
+    else{
+      document.onkeydown = checkTempo
+      frameCounter = 0
+      clearInterval(count)
+    }
+  },tempo)
 }
 function checkTempo(e){
   clearTimeout(timeOut)
   clearInterval(count)
   timeOut = setTimeout(()=>{
-    stopMusic()
     playing = false
     clearInterval(count)
     frameCounter = 0
+    pointer = 3
+    fail('Done Playing?')
   },tempo*2)
-  if(e.key !== currentNote){
+  if(e.key !== note1){
     strikes++
     if(strikes === 3){
       fail('Too many wrong notes!')
     }
   }
-  if(frameCounter > 13){
+  if(frameCounter > 15 && playing){
     fail('Too slow!')
   }
-  else if(frameCounter < 6){
+  else if(frameCounter < 5 && playing){
     fail('Too fast')
   }
   else{
+    if(!playing){
+      soundtrack.sound.src = './sounds/sligo.m4a'
+      soundtrack.changeTime(0)
+      soundtrack.sound.play()
+      playing = true
+    }
     frameCounter = 0
     count = setInterval(()=>{
       frameCounter++
     },tempo/10)
+    note1 = note2
+    note2 = note3
+    if(pointer !== notes.length){
+      note3 = notes[pointer++]
+    }
+    else{
+      note3 = ''
+    }
+    document.getElementById('note1').innerHTML = note1
+    document.getElementById('note2').innerHTML = note2
+    document.getElementById('note3').innerHTML = note3
   }
 }
 function fail(message){
+  soundtrack.sound.pause()
+  soundtrack.changeTime(0)
+  document.onkeydown = null
   document.getElementById('credits').innerHTML = message
+  clearTimeout(timeOut)
   timeOut = setTimeout(()=>{
     document.getElementById('credits').style.display = 'none'
+    stand()
   },1500)
+  strikes = 0
+  playing = false
 }
 function checkArrowDown(e){
   if(e.keyCode === 37){
@@ -534,8 +623,8 @@ function sit(){
   chair.image = strumOpen
   document.getElementById('tune-button').style.display = 'block'
   stopMusic()
-  play()
-  //playGuitarHero()
+  //play()
+  playGuitarHero()
 }
 function lay(){
   fahey.invisible = true
@@ -551,6 +640,7 @@ function lay(){
   }
   else{
     document.getElementById('credits').style.display = 'flex'
+    document.getElementById('credits').innerHTML = '<h1>Thanks for playing!</h1>'
     chair.invisible = true
     guitar.invisible = true
   }
@@ -918,7 +1008,7 @@ function playMusic(){
 }
 function playSligo(){
   sligo = true
-  soundtrack.sound.src = './sounds/sligo.mp3'
+  soundtrack.sound.src = './sounds/sligo.m4a'
   soundtrack.changeTime(0)
   soundtrack.sound.play()
 }
