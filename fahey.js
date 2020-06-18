@@ -68,7 +68,7 @@ var note3
 var count
 var strikes = 0
 var frameCounter = 0
-var tempo = 450
+var tempo = 420
 var playing = false
 var notes = []
 var keys = [
@@ -255,6 +255,7 @@ function play(){
   document.onkeyup = checkNoteUp
 }
 function playGuitarHero(){
+  document.onkeydown = null
   for(let i = 0; i < songs[songIndex].length; i++){
     notes[i] = keys[Math.floor(Math.random()*26)]
   }
@@ -267,6 +268,7 @@ function playGuitarHero(){
   <h1 id="note2" class="note">${note2}</h1>
   <h1 id="note3" class="note">${note3}</h1>`
   frameCounter = 0
+  beeping = true
   count = setInterval(()=>{
     if(frameCounter < 4){
       speak('./sounds/beep.m4a')
@@ -286,8 +288,6 @@ function checkTempo(e){
   timeOut = setTimeout(()=>{
     playing = false
     clearInterval(count)
-    frameCounter = 0
-    pointer = 3
     fail('Done Playing?')
   },tempo*2)
   if(e.key !== note1){
@@ -327,6 +327,7 @@ function checkTempo(e){
   }
 }
 function fail(message){
+  frameCounter = 0
   soundtrack.sound.pause()
   soundtrack.changeTime(0)
   document.onkeydown = null
@@ -618,6 +619,7 @@ function drawWood(){
   }
 }
 function sit(){
+  frameCounter = 0
   fahey.invisible = true
   guitar.invisible = true
   chair.image = strumOpen
@@ -1243,8 +1245,7 @@ function perform(){
   guitar.invisible = true
   stool.image = stoolSit
   document.getElementById('tune-button').style.display = 'block'
-  document.onkeydown = checkNoteDownShow
-  document.onkeyup = checkNoteUp
+  playGuitarHero()
 }
 function checkNoteDownShow(e){
     switch(e.key){
