@@ -62,6 +62,7 @@ canvas.clear = function(){
   var ctx = canvas.getContext('2d')
   ctx.clearRect(0,0,600,400)
 }
+var playing = false
 var turtleIndex = false
 var turtleToggle = setInterval(()=>{
   turtleIndex = !turtleIndex
@@ -78,6 +79,7 @@ var volume = 1.0
 var backgroundMusic
 var soundtrack = new Sound('poorBoy.wav')
 var knockSound = new Sound('knockSound.mp3')
+var guitarHero = new Sound('sligo.mp3')
 var spotlight = false
 var components = []
 var fahey
@@ -199,6 +201,45 @@ function play(){
   eString = new String(sounds['e3'])
   document.onkeydown = checkNoteDown
   document.onkeyup = checkNoteUp
+}
+function playGuitarHero(){
+  document.getElementById('credits').style.display = 'flex'
+  document.onkeypress = checkTempo
+  frameCounter = 0
+}
+function checkTempo(e){
+  clearTimeout(timeOut)
+  clearInterval(count)
+  timeOut = setTimeout(()=>{
+    stopMusic()
+    playing = false
+    clearInterval(count)
+    frameCounter = 0
+  },tempo*2)
+  if(e.key !== currentNote){
+    strikes++
+    if(strikes === 3){
+      fail('Too many wrong notes!')
+    }
+  }
+  if(frameCounter > 13){
+    fail('Too slow!')
+  }
+  else if(frameCounter < 6){
+    fail('Too fast')
+  }
+  else{
+    frameCounter = 0
+    count = setInterval(()=>{
+      frameCounter++
+    },tempo/10)
+  }
+}
+function fail(message){
+  document.getElementById('credits').innerHTML = message
+  timeOut = setTimeout(()=>{
+    document.getElementById('credits').style.display = 'none'
+  },1500)
 }
 function checkArrowDown(e){
   if(e.keyCode === 37){
@@ -482,6 +523,7 @@ function sit(){
   document.getElementById('tune-button').style.display = 'block'
   stopMusic()
   play()
+  //playGuitarHero()
 }
 function lay(){
   fahey.invisible = true
