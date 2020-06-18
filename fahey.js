@@ -65,8 +65,8 @@ canvas.clear = function(){
 //constants
 {
 var dressingRoom = true
-var practiced = false
-var freeStyle = true
+var practiced = true
+var freeStyle = false
 var sitting = false
 var note1
 var note2
@@ -415,7 +415,7 @@ function spaceScreen(){
   document.getElementById('credits').style.display = 'flex'
   document.getElementById('credits').innerHTML = `<div id="spaceScreen">
   <h3>${songs[songIndex].name}</h3>
-  <h6>Press space to begin</h6>
+  <h5>Press space to begin</h5>
 </div>`
   document.onkeydown = null
   document.onkeydown = pressSpace
