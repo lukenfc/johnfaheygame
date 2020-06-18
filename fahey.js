@@ -65,7 +65,7 @@ canvas.clear = function(){
 //constants
 {
 var dressingRoom = true
-var practiced = true
+var practiced = false
 var freeStyle = true
 var sitting = false
 var note1
@@ -333,7 +333,7 @@ function checkTempo(e){
   }
   if(e.key !== note1){
     strikes++
-    if(strikes > 10){
+    if(strikes > 20){
       fail('Too many wrong notes!')
     }
   }
