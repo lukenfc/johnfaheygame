@@ -82,7 +82,7 @@ var backgroundMusic
 var soundtrack = new Sound('poorBoy.wav')
 var knockSound = new Sound('knockSound.mp3')
 var faheyNoise = new Sound('uhh1.m4a')
-var applause = new Sound('applause.mp3')
+var applause = new Sound('applause.m4a')
 applause.sound.volume = .6
 faheyNoise.sound.volume = 0.2
 var spotlight = false
@@ -124,6 +124,8 @@ var eString
   }
 //initialize images
 {
+  var goober = createImage('./images/goober.png')
+  var flowerImage = createImage('./images/flower.png')
   var drinkCoke = createImage('./images/drinkCoke.png')
   var recycle = createImage('./images/recycle.png')
   var turtle1 = createImage('./images/turtle1.png')
@@ -235,6 +237,7 @@ function checkArrowDown(e){
   else if(e.keyCode === 32){
     if(coke && !fahey.walking){
       fahey.image = drinkCoke
+      speak('./sounds/sip.mp3')
     }
   }
 }
@@ -255,6 +258,7 @@ function checkArrowUp(e){
     if(coke){
       fahey.image = idleFrontCoke
       fahey.idleImage = idleFrontCoke
+      faheyNoise.stop()
     }
   }
 }
@@ -467,6 +471,7 @@ function drawWood(){
   }
   ctx.fillStyle = 'white'
   ctx.fillRect(0,0,600,150)
+  ctx.drawImage(goober, 543,30,40,60)
   if(!doorBool){
     if(knock && visiting){
       ctx.fillStyle = 'black'
@@ -550,6 +555,8 @@ function enterDoor(){
   clearTimeout(timeOut)
   if(EString){
     if(!performed){
+      talking = false
+      speak('./sounds/door.mp3')
       document.onkeydown = null
       document.onkeyup = null
       doorBool = true
@@ -578,7 +585,7 @@ function doorClose(){
       drawWood()
       fahey.newPos()
       components.sort(compare)
-      for(let i = 0; i < 6; i++){
+      for(let i = 0; i < 7; i++){
         components[i].update()
       }
       if(opacity === 10){
@@ -705,6 +712,9 @@ function setStage(){
         }
         //draw fahey
         stool.update()
+        if(!fahey.invisible){
+          ctx.drawImage(guitarImage, 300,240,65,150)
+        }
         stagePos()
         fahey.update()
         //tint screen
@@ -747,6 +757,7 @@ function setStage(){
       //}
       else{
         stool.update()
+        ctx.drawImage(guitarImage, 300,240,65,150)
         stagePos()
         fahey.update()
         //tint screen
@@ -876,16 +887,7 @@ function stopMusic(){
 }
 function startGame(){
   if(performed){
-    fadeOut = setInterval(()=>{
-      if(applause.sound.volume > 0){
-        applause.sound.volume -= 0.1
-      }
-      else{
-        clearInterval(fadeOut)
-        applause.sound.pause()
-        applause.changeTime(0)
-      }
-    },500)
+    applause.sound.pause()
   }
   document.getElementById('header').style.display = 'flex'
   document.getElementById('start-button').style.display = 'none'
@@ -899,7 +901,7 @@ function startGame(){
         drawWood()
         fahey.newPos()
         components.sort(compare)
-        for(let i = 0; i < 6; i++){
+        for(let i = 0; i < 7; i++){
           components[i].update()
         }
         if(sligo){
@@ -1071,12 +1073,25 @@ sound5 = new Sound(sounds['b3'].srcText)
           0 //border offset
         )
         }
+        {
+          flower = new component(
+            40, //width
+            40, //height
+            flowerImage, //image
+            380, //x
+            130, //y
+            20, //border width
+            15, //border height
+            0 //border offset
+          )
+          }
     components[0] = fahey
     components[1] = chair
     components[2] = guitar
     components[3] = couch
     components[4] = machine
     components[5] = bin
+    components[6] = flower
   }
   soundtrack.sound.volume = 1
   playMusic()
@@ -1273,6 +1288,7 @@ function checkNoteDownShow(e){
 }
 function standShow(){
   applause.volume = 1
+  applause.changeTime(0)
   applause.sound.play()
   fahey.invisible = false
   fahey.image = idleFront
@@ -1619,7 +1635,10 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
           this.move('left', this.border.right - machine.border.left)
         }
         else if(isColliding('right', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('right', 5)
@@ -1640,8 +1659,14 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
         else if(isColliding('left', this.border, machine.border)){
           this.move('right', machine.border.right - this.border.left)
         }
+        else if(isColliding('left', this.border, flower.border)){
+          this.move('right', flower.border.right - this.border.left)
+        }
         else if(isColliding('left', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('left', 5)
@@ -1664,8 +1689,14 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
         else if(isColliding('up', this.border, machine.border)){
           coke = true
         }
+        else if(isColliding('up', this.border, flower.border)){
+          this.move('down', flower.border.bottom - this.border.top)
+        }
         else if(isColliding('up', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('up', 5)
@@ -1707,7 +1738,10 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
           this.border.bottom - machine.border.top
         }
         else if(isColliding('down', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('down', 5)
@@ -1716,12 +1750,18 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
     }
     if(knock){
       if(this.border.left > 350 && this.border.top < 230){
+        if(!visiting){
+          talking = false
+          speak('./sounds/door.mp3')
+        }
         visiting = true
         document.getElementById('message').innerHTML = `<b>${birthdayMessages[seaman-1].name}: </b>${birthdayMessages[seaman-1].message}`
         document.getElementById('message').style.display = 'block'
         if(!wait){
           timeOut = setTimeout(()=>{
             knock = false
+            talking = false
+            speak('./sounds/door.mp3')
             wait = false
               visiting = false
               seaman++
