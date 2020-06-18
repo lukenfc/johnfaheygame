@@ -26,8 +26,9 @@ body{
   width: auto;
   font-size: 20px;
   margin-right: 10px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
-#tuningScreen{
+.screen{
   display: none;
   width: 270px;
   height: 420px;
@@ -39,6 +40,7 @@ body{
   background-color: white;
   padding: 15px;
   overflow: scroll;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 #start-button{
   position: absolute;
@@ -46,34 +48,67 @@ body{
   height: 40px;
   top: 50%;
   left: 50%;
-  margin-top: 100px;
+  margin-top: 180px;
   margin-left: -50px;
+  font-size: 20px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
 }
 #tune-button{
   display: none;
 }
 #message{
   display: none;
-  max-height: 150px;
+  overflow: scroll;
   width: 250px;
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: 80px;
-  margin-left: -125px;
+  margin-top: -150px;
+  margin-left: -150px;
   z-index: 3;
-  background-color: black;
+  background-color: rgba(0,0,0,.85);
   color: white;
   text-align: center;
-  padding: 10px;
-  font-family: 'Sans-serif';
+  padding: 15px;
+  font-family: "Comic Sans MS", cursive, sans-serif;
   font-size: 15px;
-  line-height: 10px;
-  border-style: solid;
-  border-color: gray;
-  border-width: 4px;
   border-radius: 5px;
 }
+b{
+  color: #ffceac;
+}
+#noah{
+  max-width: 240px;
+  height: auto;
+}
+h2{
+  margin: auto;
+}
+.line{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+#credits{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -170px;
+  margin-top: 30px;
+  width: 300px;
+  height: 80px;
+  padding: 20px;
+  text-align: center;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  z-index: 3;
+  background-color: rgba(0,0,0,.85);
+  color: white;
+  border-radius: 20px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
 
 
 

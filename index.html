@@ -7,13 +7,41 @@
   <body>
     <div class="container">
       <div id="header">
-        <button class="link" onclick="window.location.reload(true)">Quit</button>
+        <button id="quit" class="link" onclick="window.location.reload(true)">Quit</button>
+        <button class="link" onclick="showControls()">Controls</button>
         <button id="tune-button" class="link" onclick="tune()">Tune</button>
       </div>
       <canvas id="canvas" width="600" height="450"></canvas>
     </div>
-    <div id="tuningScreen">
-      <div id="tuneHeader">
+    <div class="screen" id="controls-screen">
+      <div>
+        <button class="link" onclick="hideControls()">X</button>
+      </div>
+      <h2>Controls</h2>
+      <p>Move with the arrow keys and press the space bar to stand up or take a sip(when you have a drink).<p>
+      <h4>Guitar Controls:</h4>
+      <div class="line">
+        <p>Low E String</p><p>Comma</p>
+      </div>
+      <div class="line">
+        <p>A String</p><p>M</p>
+      </div>
+      <div class="line">
+        <p>D String</p><p>N</p>
+      </div>
+      <div class="line">
+        <p>G String</p><p>K</p>
+      </div>
+      <div class="line">
+        <p>B String</p><p>O</p>
+      </div>
+      <div class="line">
+        <p>High E String</p><p>0</p>
+      </div>
+      <p>When you have your guitar, press the tune button to open the tuning screen. There you can tune your strings and the note to be played when 'fretting' a particular key on your keyboard. When fretting, you only have to press a key once to change the key that's being fretted on a particular string. That being said, you must press the key that corresponds with a string's root note to stop fretting a note.  </p>
+    </div>
+    <div class="screen" id="tuningScreen">
+      <div class="header">
         <button class="link" onclick="closeTuneDisplay()">X</button>
       </div>
       <div id="tune-content">
@@ -1406,9 +1434,12 @@
       </div>
     </div>
     <div id="homescreen">
-      <button id="start-button" onclick="startGame()">Start</button>
+      <button id="start-button" onclick="startGame()">Play</button>
     </div>
     <div id="message"></div>
+    <div id="credits">
+      <h1>Thanks for playing!</h1>
+    </div>
     <script src="fahey.js"></script>
   </body>
 </html>
