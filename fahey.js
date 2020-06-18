@@ -67,6 +67,7 @@ var note2
 var note3
 var count
 var strikes = 0
+var tempoStrikes = 0
 var frameCounter = 0
 var tempo = 420
 var playing = false
@@ -102,10 +103,10 @@ var keys = [
 var songIndex = 0
 var songs = [
   {
-    name: 'Sligo River Blues',
-    tempo: 500,
-    length: 100
-  }
+    name: 'On the Sunny Side of the Ocean',
+    tempo: 530,
+    length: 354
+  },
 ]
 var turtleIndex = false
 var turtleToggle = setInterval(()=>{
@@ -113,6 +114,7 @@ var turtleToggle = setInterval(()=>{
   console.log('turtle')
 },500)
 var coke = false
+var clock
 var talking = false
 var stopTalking
 var visiting = false
@@ -256,19 +258,18 @@ function play(){
 }
 function playGuitarHero(){
   document.onkeydown = null
-  for(let i = 0; i < songs[songIndex].length; i++){
-    notes[i] = keys[Math.floor(Math.random()*26)]
-  }
-  pointer = 3
-  note1 = notes[0]
-  note2 = notes[1]
-  note3 = notes[2]
+  document.onkeyup = null
+  pointer = 0
+  note1 = keys[Math.floor(Math.random()*26)]
+  note2 = keys[Math.floor(Math.random()*26)]
+  note3 = keys[Math.floor(Math.random()*26)]
   document.getElementById('credits').style.display = 'flex'
   document.getElementById('credits').innerHTML = `<h1 id="note1" class="note">${note1}</h1>
   <h1 id="note2" class="note">${note2}</h1>
   <h1 id="note3" class="note">${note3}</h1>`
   frameCounter = 0
   beeping = true
+  clearInterval(count)
   count = setInterval(()=>{
     if(frameCounter < 4){
       speak('./sounds/beep.m4a')
@@ -279,44 +280,45 @@ function playGuitarHero(){
       document.onkeydown = checkTempo
       frameCounter = 0
       clearInterval(count)
+      clock = setInterval(()=>{
+        if(!playing){
+          tempoStrikes++
+          if(tempoStrikes > 3){
+            fail('Too slow!')
+          }
+        }
+        playing = false
+        pointer++
+      },songs[songIndex].tempo)
+      soundtrack.sound.src = './sounds/sunnySide.m4a'
+      soundtrack.changeTime(0)
+      soundtrack.sound.play()
     }
-  },tempo)
+  },songs[songIndex].tempo)
 }
 function checkTempo(e){
-  clearTimeout(timeOut)
   clearInterval(count)
-  timeOut = setTimeout(()=>{
-    playing = false
-    clearInterval(count)
-    fail('Done Playing?')
-  },tempo*2)
+  if(e.keyCode === 32){
+    fail('Keep practicing!')
+  }
   if(e.key !== note1){
     strikes++
-    if(strikes === 3){
+    if(strikes > 10){
       fail('Too many wrong notes!')
     }
   }
-  if(frameCounter > 15 && playing){
-    fail('Too slow!')
-  }
-  else if(frameCounter < 5 && playing){
-    fail('Too fast')
-  }
   else{
-    if(!playing){
-      soundtrack.sound.src = './sounds/sligo.m4a'
-      soundtrack.changeTime(0)
-      soundtrack.sound.play()
-      playing = true
+    if(playing){
+      tempoStrikes--
+      if(tempoStrikes < -3){
+        fail('Too fast')
+      }
     }
-    frameCounter = 0
-    count = setInterval(()=>{
-      frameCounter++
-    },tempo/10)
+    playing = true
     note1 = note2
     note2 = note3
-    if(pointer !== notes.length){
-      note3 = notes[pointer++]
+    if(pointer < songs[songIndex].length){
+      note3 = keys[Math.floor(Math.random()*26)]
     }
     else{
       note3 = ''
@@ -327,18 +329,25 @@ function checkTempo(e){
   }
 }
 function fail(message){
-  frameCounter = 0
-  soundtrack.sound.pause()
+  clearInterval(clock)
+  pointer = 0
+  soundtrack.stop()
   soundtrack.changeTime(0)
   document.onkeydown = null
+  document.onkeyup = null
   document.getElementById('credits').innerHTML = message
   clearTimeout(timeOut)
   timeOut = setTimeout(()=>{
     document.getElementById('credits').style.display = 'none'
-    stand()
+    if(!performed){
+      stand()
+    }
+    else{
+      standShow()
+    }
   },1500)
   strikes = 0
-  playing = false
+  tempoStrikes = 0
 }
 function checkArrowDown(e){
   if(e.keyCode === 37){
