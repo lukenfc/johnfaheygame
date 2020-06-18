@@ -10,7 +10,7 @@ var birthdayMessages = [
   },
   {
     name: 'Connor',
-    message: 'My name is Connor',
+    message: 'Hi I`m Connor and I am not coom. To Jackson I say, thank u for showing us "The Room". Dearest ginger with ginger beard, entertaining us all with his whit and his jokes. Quite the connoisseur of the Diet Coke. While u may believe Delaware is not a state, I for one cannot relate. To Jackson Hayes Cornell AKA the Ginja, I would just like to say I wish u a happy birthday!!',
   },
   {
     name: 'Eli',
@@ -30,7 +30,7 @@ var birthdayMessages = [
   },
   {
     name: 'Kian',
-    message: '...you talkin’ to me? ye? Oh...Happy Birthday Jackson, I sincerely wouldn’t be who I am without you. HAGS',
+    message: '...you talkin` to me? ye? Oh...Happy Birthday Jackson, I sincerely wouldn`t be who I am without you. HAGS',
   },
   {
     name: 'Kyden',
@@ -38,19 +38,19 @@ var birthdayMessages = [
   },
   {
     name: 'Luke',
-    message: 'Jackson, I hope you enjoy this game. Thank you for always being an amazing friend, and showing me some great music too. Happy Birthday'
+    message: 'Happy birthday Jackson. I hope you enjoy this game. Thank you for always being an amazing friend, and showing me some great music too.'
   },
   {
     name: 'Nikhil',
-    message: 'Happy Birthday Jackson “Orville or Wilbur Wright” Cornell! Thanks for being my first friend in FL and a brother to me, hope your day is amazing!',
+    message: 'Happy Birthday Jackson "Orville or Wilbur Wright" Cornell! Thanks for being my first friend in FL and a brother to me, hope your day is amazing!',
   },
   {
     name: 'Noah',
-    message: '<img src="./images/noahDrawing.jpg>',
+    message: '<img id="noah" src="./images/noahDrawing.jpg"/>',
   },
   {
     name: 'Reece',
-    message: 'Happy Birthday Jackson! Over the last some odd years that we’ve been friends, you impacted an influenced my life in a lot of positive ways. I’m a better person because of your friendship, and I’m incredibly happy to consider you a brother. Happy birthday bud, I hope it’s a fantastic day.',
+    message: 'Happy Birthday Jackson! Over the last some odd years that we`ve been friends, you impacted an influenced my life in a lot of positive ways. I`m a better person because of your friendship, and I`m incredibly happy to consider you a brother. Happy birthday bud, I hope it`s a fantastic day.',
   },
   {
     name: 'Seth',
@@ -69,7 +69,10 @@ var turtleToggle = setInterval(()=>{
   console.log('turtle')
 },500)
 var coke = false
+var talking = false
+var stopTalking
 var visiting = false
+var wait = false
 var timeOut
 var fadeOut
 var fadeIn
@@ -80,6 +83,10 @@ var backgroundMusic
 var soundtrack = new Sound('poorBoy.wav')
 var knockSound = new Sound('knockSound.mp3')
 var guitarHero = new Sound('sligo.mp3')
+var faheyNoise = new Sound('uhh1.m4a')
+var applause = new Sound('applause.m4a')
+applause.sound.volume = .6
+faheyNoise.sound.volume = 0.2
 var spotlight = false
 var components = []
 var fahey
@@ -119,6 +126,8 @@ var eString
   }
 //initialize images
 {
+  var goober = createImage('./images/goober.png')
+  var flowerImage = createImage('./images/flower.png')
   var drinkCoke = createImage('./images/drinkCoke.png')
   var recycle = createImage('./images/recycle.png')
   var turtle1 = createImage('./images/turtle1.png')
@@ -269,6 +278,7 @@ function checkArrowDown(e){
   else if(e.keyCode === 32){
     if(coke && !fahey.walking){
       fahey.image = drinkCoke
+      speak('./sounds/sip.mp3')
     }
   }
 }
@@ -289,6 +299,7 @@ function checkArrowUp(e){
     if(coke){
       fahey.image = idleFrontCoke
       fahey.idleImage = idleFrontCoke
+      faheyNoise.stop()
     }
   }
 }
@@ -501,6 +512,7 @@ function drawWood(){
   }
   ctx.fillStyle = 'white'
   ctx.fillRect(0,0,600,150)
+  ctx.drawImage(goober, 543,30,40,60)
   if(!doorBool){
     if(knock && visiting){
       ctx.fillStyle = 'black'
@@ -529,10 +541,18 @@ function lay(){
   fahey.invisible = true
   couch.image = couchImageSit
   document.onkeydown = null
-  document.onkeydown = function(e){
-    if(e.keyCode === 32){
-      awaken()
+  if(seaman < 15){
+    document.onkeydown = function(e){
+      if(e.keyCode === 32){
+        awaken()
+        speak('./sounds/hmm1.m4a')
+      }
     }
+  }
+  else{
+    document.getElementById('credits').style.display = 'flex'
+    chair.invisible = true
+    guitar.invisible = true
   }
   stopMusic()
   playSligo()
@@ -577,6 +597,8 @@ function enterDoor(){
   clearTimeout(timeOut)
   if(EString){
     if(!performed){
+      talking = false
+      speak('./sounds/door.mp3')
       document.onkeydown = null
       document.onkeyup = null
       doorBool = true
@@ -587,10 +609,11 @@ function enterDoor(){
   else{
     document.getElementById('message').style.display = 'block'
     document.getElementById('message').innerHTML = 'You must practice before the show!'
+    speak('./sounds/uhh1.m4a')
     clearTimeout(timeOut)
     timeOut = setTimeout(()=>{
       document.getElementById('message').style.display = 'none'
-    },1000)
+    },1500)
   }
 }
 function doorClose(){
@@ -604,7 +627,7 @@ function doorClose(){
       drawWood()
       fahey.newPos()
       components.sort(compare)
-      for(let i = 0; i < 6; i++){
+      for(let i = 0; i < 7; i++){
         components[i].update()
       }
       if(opacity === 10){
@@ -727,10 +750,13 @@ function setStage(){
       if(fahey.y < 200){
         if(spotlight === false){
           spotlight = true
-          
+          applause.sound.play()
         }
         //draw fahey
         stool.update()
+        if(!fahey.invisible){
+          ctx.drawImage(guitarImage, 300,240,65,150)
+        }
         stagePos()
         fahey.update()
         //tint screen
@@ -773,6 +799,7 @@ function setStage(){
       //}
       else{
         stool.update()
+        ctx.drawImage(guitarImage, 300,240,65,150)
         stagePos()
         fahey.update()
         //tint screen
@@ -887,7 +914,7 @@ function playMusic(){
   backgroundMusic = setInterval(()=>{
     soundtrack.changeTime(0)
     soundtrack.sound.play()
-  },12*4*1001/1.5)
+  },12*4*1000/1.5)
 }
 function playSligo(){
   sligo = true
@@ -901,6 +928,9 @@ function stopMusic(){
   soundtrack.changeTime(0)
 }
 function startGame(){
+  if(performed){
+    applause.sound.pause()
+  }
   document.getElementById('header').style.display = 'flex'
   document.getElementById('start-button').style.display = 'none'
   //detect keypresses and canvas update
@@ -913,7 +943,7 @@ function startGame(){
         drawWood()
         fahey.newPos()
         components.sort(compare)
-        for(let i = 0; i < 6; i++){
+        for(let i = 0; i < 7; i++){
           components[i].update()
         }
         if(sligo){
@@ -1085,17 +1115,35 @@ sound5 = new Sound(sounds['b3'].srcText)
           0 //border offset
         )
         }
+        {
+          flower = new component(
+            40, //width
+            40, //height
+            flowerImage, //image
+            380, //x
+            130, //y
+            20, //border width
+            15, //border height
+            0 //border offset
+          )
+          }
     components[0] = fahey
     components[1] = chair
     components[2] = guitar
     components[3] = couch
     components[4] = machine
     components[5] = bin
+    components[6] = flower
   }
   soundtrack.sound.volume = 1
   playMusic()
 }
 function perform(){
+  if(!performed){
+    applause.sound.pause()
+    applause.sound.currentTime = 20
+    applause.sound.play()
+  }
   performed = true
   fahey.up = false
   fahey.left = false
@@ -1281,6 +1329,9 @@ function checkNoteDownShow(e){
     }
 }
 function standShow(){
+  applause.volume = 1
+  applause.changeTime(0)
+  applause.sound.play()
   fahey.invisible = false
   fahey.image = idleFront
   guitar.invisible = false
@@ -1289,6 +1340,24 @@ function standShow(){
   fahey.move('left',150)
   stool.image = stoolImage
   document.getElementById('tune-button').style.display = 'none'
+}
+function showControls(){
+  document.getElementById('controls-screen').style.display = 'block'
+  document.getElementById('tuningScreen').style.display = 'none'
+}
+function hideControls(){
+  document.getElementById('controls-screen').style.display = 'none'
+}
+function speak(src){
+  if(!talking){
+    faheyNoise.sound.src = src
+    faheyNoise.changeTime(0)
+    faheyNoise.sound.play()
+    talking = true
+    stopTalking = setTimeout(()=>{
+      talking = false
+    },2000)
+  }
 }
 function Sound(src){
   this.sound = document.createElement("audio");
@@ -1608,7 +1677,10 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
           this.move('left', this.border.right - machine.border.left)
         }
         else if(isColliding('right', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('right', 5)
@@ -1629,8 +1701,14 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
         else if(isColliding('left', this.border, machine.border)){
           this.move('right', machine.border.right - this.border.left)
         }
+        else if(isColliding('left', this.border, flower.border)){
+          this.move('right', flower.border.right - this.border.left)
+        }
         else if(isColliding('left', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('left', 5)
@@ -1653,16 +1731,29 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
         else if(isColliding('up', this.border, machine.border)){
           coke = true
         }
+        else if(isColliding('up', this.border, flower.border)){
+          this.move('down', flower.border.bottom - this.border.top)
+        }
         else if(isColliding('up', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('up', 5)
         }
       }
       else if(this.border.top > 145){
-        if(this.border.left > 420 && this.border.right < 560 && !performed){
-          enterDoor()
+        if(this.border.left > 420 && this.border.right < 560){
+          if(!performed){
+            enterDoor()
+          }
+          else{
+            if(!knock){
+              speak('./sounds/uhh1.m4a')
+            }
+          }
         }
       }
       else{
@@ -1689,7 +1780,10 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
           this.border.bottom - machine.border.top
         }
         else if(isColliding('down', this.border, bin.border)){
-          coke = false
+          if(coke){
+            coke = false
+            speak('./sounds/trash.m4a')
+          }
         }
         else{
           this.move('down', 5)
@@ -1698,28 +1792,54 @@ function component(width, height, image, x, y, borderWidth, borderHeight, border
     }
     if(knock){
       if(this.border.left > 350 && this.border.top < 230){
+        if(!visiting){
+          talking = false
+          speak('./sounds/door.mp3')
+        }
         visiting = true
-        document.getElementById('message').innerHTML = `<b>${birthdayMessages[seaman-1].name}: </b><p>${birthdayMessages[seaman-1].message}</p>`
+        document.getElementById('message').innerHTML = `<b>${birthdayMessages[seaman-1].name}: </b>${birthdayMessages[seaman-1].message}`
         document.getElementById('message').style.display = 'block'
-      }
-      else{
-        if(visiting){
-          knock = false
-          visiting = false
-          seaman++
-          document.getElementById('message').style.display = 'none'
-          if(seaman < 15){
-            timeOut = setTimeout(()=>{
-              knockSound.changeTime(0)
-              knockSound.sound.play()
-              clearTimeout(timeOut)
-              timeOut = setTimeout(()=>{
-                knock = true
-              },1000)
-            },5000)
-          }
+        if(!wait){
+          timeOut = setTimeout(()=>{
+            knock = false
+            talking = false
+            speak('./sounds/door.mp3')
+            wait = false
+              visiting = false
+              seaman++
+              document.getElementById('message').style.display = 'none'
+              if(seaman < 15){
+                timeOut = setTimeout(()=>{
+                  knockSound.changeTime(0)
+                  knockSound.sound.play()
+                  clearTimeout(timeOut)
+                  timeOut = setTimeout(()=>{
+                    knock = true
+                  },1000)
+                },5000)
+              }
+          },3000 + (birthdayMessages[seaman-1].message.length+1)*35)
+          wait = true
         }
       }
+      // else{
+      //   if(visiting){
+      //     knock = false
+      //     visiting = false
+      //     seaman++
+      //     document.getElementById('message').style.display = 'none'
+      //     if(seaman < 15){
+      //       timeOut = setTimeout(()=>{
+      //         knockSound.changeTime(0)
+      //         knockSound.sound.play()
+      //         clearTimeout(timeOut)
+      //         timeOut = setTimeout(()=>{
+      //           knock = true
+      //         },1000)
+      //       },5000)
+      //     }
+      //   }
+      // }
     }
   }
 }
