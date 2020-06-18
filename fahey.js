@@ -65,8 +65,8 @@ canvas.clear = function(){
 //constants
 {
 var dressingRoom = true
-var practiced = true
-var freeStyle = false
+var practiced = false
+var freeStyle = true
 var sitting = false
 var note1
 var note2
@@ -119,6 +119,12 @@ var songs = [
     filePath: './sounds/sunflower.m4a',
     tempo: 666,
     length: 237
+  },
+  {
+    name: 'Dance Of The Inhabitants Of The Palace Of King Philip Of Spain',
+    filePath: './sounds/inhabitants.m4a',
+    tempo: 454,
+    length: 413
   }
 ]
 var turtleIndex = false
