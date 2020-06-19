@@ -299,9 +299,16 @@ function playGuitarHero(){
   note2 = keys[Math.floor(Math.random()*26)]
   note3 = keys[Math.floor(Math.random()*26)]
   document.getElementById('credits').style.display = 'flex'
-  document.getElementById('credits').innerHTML = `<h1 id="note1" class="note">${note1}</h1>
-  <h1 id="note2" class="note">${note2}</h1>
-  <h1 id="note3" class="note">${note3}</h1>`
+  document.getElementById('credits').innerHTML = 
+  `<div id="notes">
+    <h1 id="note1" class="note">${note1}</h1>
+    <h1 id="note2" class="note">${note2}</h1>
+    <h1 id="note3" class="note">${note3}</h1>
+  </div>
+    <div id="meter">
+      <h4 class="label">Slow</h4><div id="white-line"></div><h4 class="label">Fast</h4>
+    </div>
+    <div id="yellow"></div>`
   frameCounter = 0
   beeping = true
   clearInterval(count)
@@ -352,10 +359,10 @@ function checkTempo(e){
     }
     else{
       if(tempoStrikes > 0){
-        tempoStrikes -= 0.2
+        tempoStrikes -= 0.1
       }
       else if(tempoStrikes < 0){
-        tempoStrikes += 0.2
+        tempoStrikes += 0.1
       }
     }
     playing = true
@@ -1057,6 +1064,14 @@ function setStage(){
           clearInterval(fadeIn)
         }
       }
+      if(sitting){
+        if(tempoStrikes < 0.2 && tempoStrikes > -0.2){
+          document.getElementById('yellow').style.marginLeft = '-4px'
+        }
+        else{
+          document.getElementById('yellow').style.marginLeft = `${(tempoStrikes*(-35)) - 4}px`
+        }
+      }
   },1000/30)
 }
 function stagePos() {
@@ -1191,6 +1206,14 @@ function startGame(){
           }
           else{
             ctx.drawImage(turtle2,325,20,90,90)
+          }
+        }
+        if(sitting){
+          if(tempoStrikes < 0.2 && tempoStrikes > -0.2){
+            document.getElementById('yellow').style.marginLeft = '-4px'
+          }
+          else{
+            document.getElementById('yellow').style.marginLeft = `${(tempoStrikes*(-35)) - 4}px`
           }
         }
     },1000/30)
