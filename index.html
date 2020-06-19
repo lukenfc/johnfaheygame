@@ -43,6 +43,13 @@
     <div class="screen" id="tuningScreen">
       <div class="header">
         <button class="link" onclick="closeTuneDisplay()">X</button>
+        <label for="song">Song: </label>
+        <select id="song" value="0" onchange="changeSong()">
+          <option value="-1">Free Style</option>
+          <option value="0">On the Sunny Side of the Ocean</option>
+          <option value="1">Sunflower River Blues</option>
+          <option value="2">Dance Of The Inhabitants Of The Palace Of King Philip Of Spain</option>
+        </select>
       </div>
       <div id="tune-content">
         <h4>Low E String</h4>
@@ -1438,7 +1445,9 @@
     </div>
     <div id="message"></div>
     <div id="credits">
-      <h1>Thanks for playing!</h1>
+      <h1 id="note1" class="note"></h1>
+      <h1 id="note2" class="note"></h1>
+      <h1 id="note3" class="note"></h1>
     </div>
     <script src="fahey.js"></script>
   </body>

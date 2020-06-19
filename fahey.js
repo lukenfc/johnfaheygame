@@ -62,12 +62,79 @@ canvas.clear = function(){
   var ctx = canvas.getContext('2d')
   ctx.clearRect(0,0,600,400)
 }
+//constants
+{
+var dressingRoom = true
+var practiced = false
+var freeStyle = true
+var sitting = false
+var note1
+var note2
+var note3
+var count
+var strikes = 0
+var tempoStrikes = 0
+var frameCounter = 0
+var tempo = 420
+var playing = false
+var notes = []
+var keys = [
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z'
+]
+var songIndex = 0
+var songs = [
+  {
+    name: 'On the Sunny Side of the Ocean',
+    filePath: './sounds/sunnySide.m4a',
+    tempo: 530,
+    length: 358
+  },
+  {
+    name: 'Sunflower River Blues',
+    filePath: './sounds/sunflower.m4a',
+    tempo: 666,
+    length: 237
+  },
+  {
+    name: 'Dance Of The Inhabitants Of The Palace Of King Philip Of Spain',
+    filePath: './sounds/inhabitants.m4a',
+    tempo: 454,
+    length: 413
+  }
+]
 var turtleIndex = false
+var failure = false
 var turtleToggle = setInterval(()=>{
   turtleIndex = !turtleIndex
   console.log('turtle')
 },500)
 var coke = false
+var clock
 var talking = false
 var stopTalking
 var visiting = false
@@ -83,6 +150,7 @@ var soundtrack = new Sound('poorBoy.wav')
 var knockSound = new Sound('knockSound.mp3')
 var faheyNoise = new Sound('uhh1.m4a')
 var applause = new Sound('applause.m4a')
+var boo = new Sound('boo.m4a')
 applause.sound.volume = .6
 faheyNoise.sound.volume = 0.2
 var spotlight = false
@@ -100,13 +168,16 @@ var sligo = false
 var performed = false
 var knock = false
 var seaman = 1
+}
 //declare string objects
+{
 var EString
 var aString
 var dString
 var gString
 var bString
 var eString
+}
 //low e, a, d string frets
 {
   var xSound1
@@ -200,14 +271,180 @@ var eString
 
 //var aKey = new Fret(gString, 'a', 'a2')
 function play(){
-  EString = new String(sounds['d1'])
-  aString = new String(sounds['a1'])
-  dString = new String(sounds['d2'])
-  gString = new String(sounds['g2'])
-  bString = new String(sounds['b2'])
-  eString = new String(sounds['e3'])
+  if(!EString){
+    EString = new String(sounds['d1'])
+    aString = new String(sounds['a1'])
+    dString = new String(sounds['d2'])
+    gString = new String(sounds['g2'])
+    bString = new String(sounds['b2'])
+    eString = new String(sounds['e3'])
+  }
+  document.getElementById('credits').style.display = 'none'
   document.onkeydown = checkNoteDown
   document.onkeyup = checkNoteUp
+}
+function playGuitarHero(){
+  if(!EString){
+    EString = new String(sounds['d1'])
+    aString = new String(sounds['a1'])
+    dString = new String(sounds['d2'])
+    gString = new String(sounds['g2'])
+    bString = new String(sounds['b2'])
+    eString = new String(sounds['e3'])
+  }
+  document.onkeydown = null
+  document.onkeyup = null
+  pointer = 0
+  note1 = keys[Math.floor(Math.random()*26)]
+  note2 = keys[Math.floor(Math.random()*26)]
+  note3 = keys[Math.floor(Math.random()*26)]
+  document.getElementById('credits').style.display = 'flex'
+  document.getElementById('credits').innerHTML = `<h1 id="note1" class="note">${note1}</h1>
+  <h1 id="note2" class="note">${note2}</h1>
+  <h1 id="note3" class="note">${note3}</h1>`
+  frameCounter = 0
+  beeping = true
+  clearInterval(count)
+  count = setInterval(()=>{
+    if(frameCounter < 4){
+      speak('./sounds/beep.m4a')
+      talking = false
+      frameCounter++
+    }
+    else{
+      document.onkeydown = checkTempo
+      frameCounter = 0
+      clearInterval(count)
+      clock = setInterval(()=>{
+        if(!playing){
+          tempoStrikes++
+          if(tempoStrikes > 3){
+            fail('Too slow!')
+          }
+        }
+        playing = false
+        pointer++
+      },songs[songIndex].tempo)
+      soundtrack.sound.src = songs[songIndex].filePath
+      soundtrack.changeTime(0)
+      soundtrack.sound.volume = 1
+      soundtrack.sound.play()
+    }
+  },songs[songIndex].tempo)
+}
+function checkTempo(e){
+  clearInterval(count)
+  if(e.keyCode === 32){
+    fail('Keep practicing!')
+  }
+  if(e.key !== note1){
+    strikes++
+    if(strikes > 20){
+      fail('Too many wrong notes!')
+    }
+  }
+  else{
+    if(playing){
+      tempoStrikes--
+      if(tempoStrikes < -3){
+        fail('Too fast')
+      }
+    }
+    else{
+      if(tempoStrikes > 0){
+        tempoStrikes -= 0.2
+      }
+      else if(tempoStrikes < 0){
+        tempoStrikes += 0.2
+      }
+    }
+    playing = true
+    if(note2 === ''){
+      fail('Bravo!')
+      practiced = true
+    }
+    note1 = note2
+    note2 = note3
+    if(pointer < songs[songIndex].length){
+      note3 = keys[Math.floor(Math.random()*26)]
+    }
+    else{
+      note3 = ''
+    }
+    document.getElementById('note1').innerHTML = note1
+    document.getElementById('note2').innerHTML = note2
+    document.getElementById('note3').innerHTML = note3
+  }
+}
+function fail(message){
+  clearInterval(clock)
+  pointer = 0
+  document.onkeydown = null
+  document.onkeyup = null
+  document.getElementById('credits').innerHTML = message
+  clearTimeout(timeOut)
+  timeOut = setTimeout(()=>{
+    document.getElementById('credits').style.display = 'none'
+    if(performed && !dressingRoom){
+      standShow()
+      if(message === 'Bravo!'){
+        applause.sound.volume = 1
+        applause.changeTime(0)
+        applause.sound.play()
+        failure = false
+      }
+      else{
+        soundtrack.sound.pause()
+        soundtrack.changeTime(0)
+        boo.sound.volume = 1
+        boo.changeTime(0)
+        boo.sound.play()
+        failure = true
+      }
+    }
+    else{
+      stand()
+    }
+  },1500)
+  strikes = 0
+  tempoStrikes = 0
+}
+function spaceScreen(){
+  if(!performed || dressingRoom){
+    document.getElementById('credits').style.marginLeft = '-80px'
+    document.getElementById('credits').style.marginTop = '30px'
+  }
+  else{
+    document.getElementById('credits').style.marginLeft = '-180px'
+    document.getElementById('credits').style.marginTop = '100px'
+  }
+  document.getElementById('credits').style.display = 'flex'
+  document.getElementById('credits').innerHTML = `<div id="spaceScreen">
+  <h3>${songs[songIndex].name}</h3>
+  <h5>Press space to begin</h5>
+</div>`
+  document.onkeydown = null
+  document.onkeydown = pressSpace
+}
+function pressSpace(e){
+  if(e.keyCode === 32){
+    playGuitarHero()
+  }
+}
+function changeSong(){
+  var song = Number.parseInt(document.getElementById('song').value)
+  if(song === -1){
+    play()
+    freeStyle = true
+    document.getElementById('tune-content').style.display = 'block'
+  }
+  else{
+    songIndex = song
+    spaceScreen()
+    document.getElementById('tune-content').style.display = 'none'
+    document.getElementById('tuningScreen').style.display = 'none'
+    freeStyle = false
+  }
 }
 function checkArrowDown(e){
   if(e.keyCode === 37){
@@ -431,7 +668,12 @@ function checkNoteDown (e) {
     }
   }
   if(e.keyCode === 32){
-    stand()
+    if(performed && !dressingRoom){
+      standShow()
+    }
+    else{
+      stand()
+    }
   }
 }
 function checkNoteUp (e) {
@@ -488,12 +730,19 @@ function drawWood(){
   }
 }
 function sit(){
+  sitting = true
+  frameCounter = 0
   fahey.invisible = true
   guitar.invisible = true
   chair.image = strumOpen
   document.getElementById('tune-button').style.display = 'block'
   stopMusic()
-  play()
+  if(freeStyle){
+    play()
+  }
+  else{
+    spaceScreen()
+  }
 }
 function lay(){
   fahey.invisible = true
@@ -509,6 +758,8 @@ function lay(){
   }
   else{
     document.getElementById('credits').style.display = 'flex'
+    document.getElementById('credits').innerHTML = '<h1>Thanks for playing!</h1>'
+    document.getElementById('credits').style.marginLeft = '-170px'
     chair.invisible = true
     guitar.invisible = true
   }
@@ -516,6 +767,7 @@ function lay(){
   playSligo()
 }
 function stand(){
+  sitting = false
   document.getElementById('tuningScreen').style.display = 'none'
   document.getElementById('tune-button').style.display = 'none'
   fahey.invisible = false
@@ -553,7 +805,7 @@ function awaken(){
 }
 function enterDoor(){
   clearTimeout(timeOut)
-  if(EString){
+  if(practiced){
     if(!performed){
       talking = false
       speak('./sounds/door.mp3')
@@ -603,6 +855,9 @@ function doorClose(){
         opacity++
         if(soundtrack.sound.volume > 0){
           soundtrack.sound.volume = soundtrack.sound.volume - 0.1
+        }
+        else{
+          stopMusic()
         }
       }
   },100)
@@ -655,8 +910,8 @@ function changeFret(id,key){
     }
 }
 function tune(){
-  sit()
   document.getElementById('tuningScreen').style.display = 'block'
+  document.getElementById('credits').style.display = 'none'
 }
 function closeTuneDisplay(){
   document.getElementById('tuningScreen').style.display = 'none'
@@ -671,6 +926,7 @@ function compare(a, b){
   return 0
 }
 function setStage(){
+  dressingRoom = false
   fahey.invisible = false
   fahey.move('right', 20 - fahey.border.left)
   fahey.move('down', 350 - fahey.border.top)
@@ -834,10 +1090,32 @@ function stagePos() {
     }
   }
   if(fahey.y < 200 && fahey.x > 250 && fahey.x < 370){
-    perform()
+    if(!sitting){
+      if(failure){
+        boo.sound.pause()
+        applause.changeTime(5)
+        boo.sound.play()
+      }
+      else{
+        applause.sound.pause()
+        applause.changeTime(20)
+        applause.sound.play()
+      }
+      performed = true
+      sit()
+      fahey.up = false
+      fahey.left = false
+      fahey.right = false
+      fahey.down = false
+      stool.image = stoolSit
+    }
+        
   }
   if(document.onkeydown === null){
     fahey.move('left',2)
+    if(!sitting){
+      dressingRoom = true
+    }
   }
 }
 function drawSeamen(){
@@ -876,7 +1154,7 @@ function playMusic(){
 }
 function playSligo(){
   sligo = true
-  soundtrack.sound.src = './sounds/sligo.mp3'
+  soundtrack.sound.src = './sounds/sligo.m4a'
   soundtrack.changeTime(0)
   soundtrack.sound.play()
 }
@@ -1096,206 +1374,14 @@ sound5 = new Sound(sounds['b3'].srcText)
   soundtrack.sound.volume = 1
   playMusic()
 }
-function perform(){
-  if(!performed){
-    applause.sound.pause()
-    applause.sound.currentTime = 20
-    applause.sound.play()
-  }
-  performed = true
-  fahey.up = false
-  fahey.left = false
-  fahey.right = false
-  fahey.down = false
-  fahey.invisible = true
-  guitar.invisible = true
-  stool.image = stoolSit
-  document.getElementById('tune-button').style.display = 'block'
-  document.onkeydown = checkNoteDownShow
-  document.onkeyup = checkNoteUp
-}
-function checkNoteDownShow(e){
-    switch(e.key){
-      case ',':{ 
-        if(!EString.pressed){
-          if(EString.newPitch){
-            EString.oldSound.sound.pause()
-            EString.newPitch = false
-          }
-          EString.sound.changeTime(0)
-          EString.sound.play()
-          EString.pressed = true
-        }
-        break
-      }
-      case 'm':{ 
-        if(!aString.pressed){
-          if(aString.newPitch){
-            aString.oldSound.sound.pause()
-            aString.newPitch = false
-          }
-          aString.sound.changeTime(0)
-          aString.sound.play()
-          aString.pressed = true
-        }
-        break
-      }
-      case 'n':{ 
-        if(!dString.pressed){
-          if(dString.newPitch){
-            dString.oldSound.sound.pause()
-            dString.newPitch = false
-          }
-          dString.sound.changeTime(0)
-          dString.sound.play()
-          dString.pressed = true
-        }
-        break
-      }
-      case 'k':{
-        if(!gString.pressed){
-          if(gString.newPitch){
-            gString.oldSound.sound.pause()
-            gString.newPitch = false
-          }
-          gString.sound.changeTime(0)
-          gString.sound.play()
-          gString.pressed = true
-        }
-        break
-      }
-      case 'o':{
-        if(!bString.pressed){
-          if(bString.newPitch){
-            bString.oldSound.sound.pause()
-            bString.newPitch = false
-          }
-          bString.sound.changeTime(0)
-          bString.sound.play()
-          bString.pressed = true
-        }
-        break
-      }
-      case '0':{
-        if(!eString.pressed){
-          if(eString.newPitch){
-            eString.oldSound.sound.pause()
-            eString.newPitch = false
-          }
-          eString.sound.changeTime(0)
-          eString.sound.play()
-          eString.pressed = true
-        }
-        break
-      }
-      case 'z':{
-        EString.changeSound(EString.default)
-        aString.changeSound(aString.default)
-        dString.changeSound(dString.default)
-        break
-      }
-      case 'x':{
-        EString.changeSound(xSound1)
-        aString.changeSound(xSound2)
-        dString.changeSound(xSound3)
-        break
-      }
-      case 'c':{
-        EString.changeSound(cSound1)
-        aString.changeSound(cSound2)
-        dString.changeSound(cSound3)
-        break
-      }
-      case 'v':{
-        EString.changeSound(vSound1)
-        aString.changeSound(vSound2)
-        dString.changeSound(vSound3)
-        break
-      }
-      case 'b':{
-        EString.changeSound(bSound1)
-        aString.changeSound(bSound2)
-        dString.changeSound(bSound3)
-        break
-      }
-  
-  
-      case 'a':{
-        gString.changeSound(gString.default)
-        break
-      }
-      case 's':{
-        gString.changeSound(sSound)
-        break
-      }
-      case 'd':{
-        gString.changeSound(dSound)
-        break
-      }
-      case 'f':{
-        gString.changeSound(fSound)
-        break
-      }
-      case 'g':{
-        gString.changeSound(gSound)
-        break
-      }
-      case 'q':{
-        bString.changeSound(bString.default)
-        break
-      }
-      case 'w':{
-        bString.changeSound(wSound)
-        break
-      }
-      case 'e':{
-        bString.changeSound(eSound)
-        break
-      }
-      case 'r':{
-        bString.changeSound(rSound)
-        break
-      }
-      case 't':{
-        bString.changeSound(tSound)
-        break
-      }
-  
-      case '1':{
-        eString.changeSound(eString.default)
-        break
-      }
-      case '2':{
-        eString.changeSound(sound2)
-        break
-      }
-      case '3':{
-        eString.changeSound(sound3)
-        break
-      }
-      case '4':{
-        eString.changeSound(sound4)
-        break
-      }
-      case '5':{
-        eString.changeSound(sound5)
-        break
-      }
-    }
-    if(e.keyCode === 32){
-      standShow()
-    }
-}
 function standShow(){
-  applause.volume = 1
-  applause.changeTime(0)
-  applause.sound.play()
+  sitting = false
   fahey.invisible = false
   fahey.image = idleFront
   guitar.invisible = false
   document.onkeydown = checkArrowDown
   document.onkeyup = checkArrowUp
-  fahey.move('left',150)
+  fahey.move('left',fahey.x - 200)
   stool.image = stoolImage
   document.getElementById('tune-button').style.display = 'none'
 }
